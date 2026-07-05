@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام التحقق من هوية الموظفين |  المؤشر الأخضر</title>
+    <title>نظام التحقق من هوية الموظفين | المؤشر الأخضر</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
@@ -52,6 +52,9 @@
         .company-logo {
             width: 75px;
             height: auto;
+            background-color: transparent !important;
+            border: none !important;
+            outline: none;
             filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
         }
 
@@ -172,7 +175,7 @@
         .info-row {
             display: flex;
             border-bottom: 1px solid #edf2f7;
-        }}
+        }
 
         .info-row:last-child {
             border-bottom: none;
@@ -244,59 +247,62 @@
 <body>
 
     <div class="verification-container">
-        <!-- ترويسة الشركة -->
         <div class="card-header">
-            <!-- الشعار مدمج ديناميكياً هنا من المرفقات -->
-         <img class="company-logo" src="images/IMG_1139.png" alt="شعار شركة المؤشر الأخضر">
+            <img class="company-logo" src="images/IMG_1139.png" alt="شعار شركة المؤشر الأخضر">
             <div class="company-name"> المؤشر الأخضر</div>
+            
             <div class="system-title">بوابة التحقق الذكي من الهوية</div>
         </div>
 
-        <!-- محتوى التحقق والتأكيد -->
         <div class="card-body">
             
-            <!-- أولاً: واجهة التحميل والبحث المؤقتة -->
             <div id="loading-state">
                 <div class="spinner-container">
+      
                     <div class="spinner"></div>
                 </div>
                 <div class="loading-text">جاري البحث في قاعدة البيانات ...</div>
             </div>
 
-            <!-- ثانياً: واجهة ظهور النتيجة بعد ثانيتين -->
             <div id="success-state">
-                <!-- الـ SVG الخاص بالصح الأخضر مع الأنيميشن السريع -->
+   
                 <div class="checkmark-wrapper">
                     <svg class="svg-checkmark" id="checkmark-svg" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <circle cx="26" cy="26" r="25" fill="#38a169"/>
+     
                         <path d="M16 26L23 33L37 19" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                 </div>
 
                 <div class="status-badge">
+                    
                     <span>تم التحقق من صحة البطاقة</span>
                 </div>
 
-                <!-- بيانات الموظفة الرسمية -->
                 <div class="info-table">
                     <div class="info-row">
+                      
                         <div class="info-label">اسم الموظفة</div>
                         <div class="info-value">ريم محمد صالح</div>
                     </div>
                     <div class="info-row">
                         <div class="info-label">رقم التوظيف</div>
+  
                         <div class="info-value">GI-8942</div>
                     </div>
                     <div class="info-row">
                         <div class="info-label">المسمى </div>
+          
                         <div class="info-value">مختصة إنشاء البيانات البصرية</div>
                     </div>
                     <div class="info-row">
                         <div class="info-label">الإدارة</div>
+                
                         <div class="info-value">هديل سعد العتيبي</div>
                     </div>
                     <div class="info-row">
                         <div class="info-label">حالة الحساب</div>
+                      
                         <div class="info-value" style="color: #38a169;">نشط / مصرح له</div>
                     </div>
                     <div class="info-row">
@@ -308,9 +314,9 @@
 
         </div>
 
-        <!-- التذييل الأمني -->
         <div class="card-footer">
             <div class="secure-lock">
+          
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                     <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
                 </svg>
@@ -320,14 +326,13 @@
         </div>
     </div>
 
-    <!-- التحكم البرمجي بالوقت والحركات -->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             // مؤقت لمدة ثانيتين للبحث الشكلي في قاعدة البيانات
             setTimeout(function() {
+      
                 // إخفاء التحميل
                 document.getElementById('loading-state').style.display = 'none';
-                
                 // إظهار النتيجة والبيانات
                 const successState = document.getElementById('success-state');
                 successState.style.display = 'block';
@@ -343,6 +348,7 @@
                     month: '2-digit', 
                     day: '2-digit',
                     hour: '2-digit', 
+         
                     minute: '2-digit', 
                     second: '2-digit',
                     hour12: true
