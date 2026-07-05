@@ -1,832 +1,356 @@
 <!DOCTYPE html>
-
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام التحقق من هوية الموظفين | شركة المؤشر الأخضر</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-  <title>اي ام سبيشل - الضيافة الترفيهية للأطفال</title>
-  <meta name="description" content="طوري مكان طفلك ، شاركي رأيك الآن" />
-  <meta property="og:title" content="اي ام سبيشل - الضيافة الترفيهية للأطفال" />
-  <meta property="og:description" content="طوري مكان طفلك ، شاركي رأيك الآن" />
-  <meta property="og:image" content="special.png" />
-  <meta property="og:type" content="website" />
+        body {
+            font-family: 'Tajawal', system-ui, -apple-system, sans-serif;
+            background-color: #f4f7f5;
+            color: #2d3748;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
 
-  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet" />
+        .verification-container {
+            background: #ffffff;
+            width: 100%;
+            max-width: 480px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+            text-align: center;
+            position: relative;
+        }
 
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+        /* تنسيق الهيدر العلوي للمؤسسة */
+        .card-header {
+            background: linear-gradient(135deg, #1e3a2f 0%, #2d5a45 100%);
+            padding: 25px 20px;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 4px solid #48bb78;
+        }
 
-    /*
-     * ═══════════════════════════════════════════════════════
-     * FIX #1: استبدال body background animation بـ gradient ثابت
-     * السبب: background-size:500% + animation كانت تُعيد رسم
-     * الـ background في كل frame → استهلاك CPU مستمر.
-     * الحل: gradient ثابت + pseudo-element منفصل للحركة.
-     * ═══════════════════════════════════════════════════════
-     */
-    body {
-      font-family: 'Tajawal', sans-serif;
-      min-height: 100vh;
-      /* gradient ثابت بألوان متشابهة للأصل */
-      background: linear-gradient(135deg, #e8f5ff 0%, #f0e8ff 25%, #fff0f8 50%, #e8fff4 75%, #fffbe8 100%);
-      overflow-x: hidden;
-      color: #1a252f;
-    }
+        .company-logo {
+            width: 75px;
+            height: auto;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
+        }
 
-    /*
-     * ═══════════════════════════════════════════════════════
-     * FIX #2: Aurora Blobs — إزالة filter:blur من animation
-     * السبب: blur على عناصر متحركة يُجبر GPU على إعادة رسم
-     * الـ blur في كل frame → أكبر مصدر لارتفاع حرارة الجهاز.
-     * الحل: blur ثابت + تحريك transform فقط (GPU-composited).
-     * ═══════════════════════════════════════════════════════
-     */
-    .aurora {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 0;
-      overflow: hidden;
-    }
-    .aurora-blob {
-      position: absolute;
-      border-radius: 50%;
-      /* blur ثابت لا يتغير في الـ animation */
-      filter: blur(60px);
-      opacity: 0.5;
-      will-change: transform;
-      /* استخدام translate3d فقط → يعمل على compositor thread بدون repaint */
-      animation: blobMove 10s ease-in-out infinite alternate;
-    }
-    .aurora-blob:nth-child(1) {
-      width: 480px; height: 480px;
-      background: radial-gradient(circle, #a8edea 40%, transparent 70%);
-      top: -8%; left: -8%;
-      animation-duration: 12s;
-    }
-    .aurora-blob:nth-child(2) {
-      width: 380px; height: 380px;
-      background: radial-gradient(circle, #fed6e3 40%, transparent 70%);
-      top: 30%; right: -8%;
-      animation-duration: 14s;
-      animation-delay: -4s;
-    }
-    .aurora-blob:nth-child(3) {
-      width: 330px; height: 330px;
-      background: radial-gradient(circle, #d4fc79 40%, transparent 70%);
-      bottom: -8%; left: 18%;
-      animation-duration: 16s;
-      animation-delay: -8s;
-    }
-    .aurora-blob:nth-child(4) {
-      width: 280px; height: 280px;
-      background: radial-gradient(circle, #fccb90 40%, transparent 70%);
-      top: 55%; left: -4%;
-      animation-duration: 18s;
-      animation-delay: -6s;
-    }
+        .company-name {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
 
-    /* translate3d فقط — لا scale لأنه يُعيد رسم blur */
-    @keyframes blobMove {
-      0%   { transform: translate3d(0, 0, 0); }
-      33%  { transform: translate3d(40px, 30px, 0); }
-      66%  { transform: translate3d(-30px, 60px, 0); }
-      100% { transform: translate3d(20px, -20px, 0); }
-    }
+        .system-title {
+            font-size: 13px;
+            font-weight: 400;
+            color: #a0aec0;
+            text-transform: uppercase;
+        }
 
-    /*
-     * ═══════════════════════════════════════════════════════
-     * FIX #3: إزالة glass-overlay (fixed full-screen backdrop-filter)
-     * السبب: backdrop-filter على عنصر fixed يغطي الشاشة كاملة
-     * هو الأثقل على الـ GPU — يُعيد composite كل ما خلفه
-     * في كل frame، حتى لو لا شيء يتحرك.
-     * الحل: استبداله بـ pseudo-element على body بـ opacity ثابتة.
-     * ═══════════════════════════════════════════════════════
-     */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 1;
-      /* white overlay خفيف بديل عن backdrop-filter */
-      background: rgba(255, 255, 255, 0.18);
-    }
+        /* محتوى البطاقة الداخلي */
+        .card-body {
+            padding: 40px 30px;
+            min-height: 320px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
 
-    /* Floating Emojis */
-    .floaters {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 2;
-      overflow: hidden;
-    }
-    .floater {
-      position: absolute;
-      font-size: 70px;
-      opacity: 0.45;
-      user-select: none;
-      will-change: transform;
-    }
-    .floater:nth-child(1) { left: 15%; top: 100vh; animation: calmDrift1 45s ease-in-out infinite alternate; }
-    .floater:nth-child(2) { left: 50%; top: 100vh; animation: calmDrift2 55s ease-in-out infinite alternate; animation-delay: -15s; }
-    .floater:nth-child(3) { left: 85%; top: 100vh; animation: calmDrift3 65s ease-in-out infinite alternate; animation-delay: -30s; }
+        /* واجهة البحث المؤقتة (مدتها ثانيتين) */
+        #loading-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            width: 100%;
+        }
 
-    @keyframes calmDrift1 {
-      0%   { transform: translate3d(0, 0, 0) rotate(0deg); }
-      33%  { transform: translate3d(20vw, -35vh, 0) rotate(45deg); }
-      66%  { transform: translate3d(-10vw, -70vh, 0) rotate(-20deg); }
-      100% { transform: translate3d(15vw, -110vh, 0) rotate(60deg); }
-    }
-    @keyframes calmDrift2 {
-      0%   { transform: translate3d(0, 0, 0) rotate(0deg); }
-      33%  { transform: translate3d(-20vw, -25vh, 0) rotate(-45deg); }
-      66%  { transform: translate3d(10vw, -75vh, 0) rotate(30deg); }
-      100% { transform: translate3d(-15vw, -110vh, 0) rotate(-60deg); }
-    }
-    @keyframes calmDrift3 {
-      0%   { transform: translate3d(0, 0, 0) rotate(0deg); }
-      33%  { transform: translate3d(15vw, -45vh, 0) rotate(30deg); }
-      66%  { transform: translate3d(-15vw, -65vh, 0) rotate(-10deg); }
-      100% { transform: translate3d(5vw, -110vh, 0) rotate(90deg); }
-    }
+        .spinner-container {
+            position: relative;
+            width: 80px;
+            height: 80px;
+        }
 
-    /* ── Layout ── */
-    .page {
-      position: relative;
-      z-index: 3;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 80px 18px 60px;
-    }
+        .spinner {
+            width: 100%;
+            height: 100%;
+            border: 4px solid #edf2f7;
+            border-top: 4px solid #38a169;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
 
-    /*
-     * ═══════════════════════════════════════════════════════
-     * FIX #4: Top Bar — تقليل backdrop-filter blur
-     * blur(28px) على fixed bar يُعيد repaint عند كل scroll.
-     * الحل: تقليله لـ 12px + رفع opacity الخلفية → نفس المظهر
-     * بنصف تكلفة الـ GPU.
-     * ═══════════════════════════════════════════════════════
-     */
-    .top-bar {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      height: 64px;
-      display: flex;
-      align-items: center;
-      padding: 0 18px;
-      background: rgba(255, 255, 255, 0.82);
-      backdrop-filter: blur(12px) saturate(150%);
-      -webkit-backdrop-filter: blur(12px) saturate(150%);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.7);
-      box-shadow: 0 2px 20px rgba(0,0,0,0.06);
-      z-index: 50;
-    }
-    .top-bar-inner {
-      width: 100%;
-      max-width: 520px;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .action-btn {
-      background: rgba(255, 255, 255, 0.85);
-      border: 1px solid rgba(255, 255, 255, 0.9);
-      color: #1a252f;
-      font-family: 'Tajawal', sans-serif;
-      font-size: 14px;
-      font-weight: 600;
-      padding: 8px 18px;
-      border-radius: 50px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      transition: background 0.25s, transform 0.25s;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
-    }
-    .action-btn:hover { background: rgba(255,255,255,0.97); transform: translateY(-1px); }
+        .pulse-logo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 35px;
+            height: auto;
+            opacity: 0.7;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
 
-    /*
-     * ═══════════════════════════════════════════════════════
-     * FIX #5: Hero Card — تقليل backdrop-filter
-     * blur(32px) + saturate(200%) على البطاقة الرئيسية ثقيل.
-     * الحل: blur(16px) + رفع opacity الخلفية → نفس التأثير
-     * الزجاجي بأداء أفضل بكثير.
-     * ═══════════════════════════════════════════════════════
-     */
-    .hero-card {
-      background: rgba(255, 255, 255, 0.78);
-      border: 1px solid rgba(255, 255, 255, 0.9);
-      border-radius: 28px;
-      backdrop-filter: blur(16px) saturate(160%);
-      -webkit-backdrop-filter: blur(16px) saturate(160%);
-      box-shadow:
-        0 8px 32px rgba(0,0,0,0.08),
-        inset 0 1px 0 rgba(255,255,255,0.9),
-        inset 0 -1px 0 rgba(255,255,255,0.4);
-      padding: 44px 32px 38px;
-      width: 100%;
-      max-width: 520px;
-      text-align: center;
-      animation: floatIn 0.9s cubic-bezier(0.22,1,0.36,1) both;
-    }
-    @keyframes floatIn {
-      from { opacity: 0; transform: translateY(36px) scale(0.96); }
-      to   { opacity: 1; transform: translateY(0) scale(1); }
-    }
+        .loading-text {
+            font-size: 15px;
+            font-weight: 500;
+            color: #718096;
+        }
 
-    /* ── Brand Icon ── */
-    .brand-icon {
-      position: relative;
-      width: 160px;
-      height: 160px;
-      margin: 0 auto 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 30px;
-    }
+        /* واجهة النجاح والانبثاق */
+        #success-state {
+            display: none;
+            width: 100%;
+        }
 
-    /*
-     * ═══════════════════════════════════════════════════════
-     * FIX #6: Brand Icon Glow — إزالة animation من pseudo-element
-     * كانت الـ ::before تُحرك background-size + opacity معاً
-     * مع filter:blur(100px) → ثلاث خصائص مُعيدة للرسم دفعة واحدة.
-     * الحل: glow ثابت + animation بـ opacity فقط.
-     * ═══════════════════════════════════════════════════════
-     */
-    .brand-icon::before {
-      content: '';
-      position: absolute;
-      inset: -15px;
-      background: conic-gradient(from 0deg, #2196F3, #F44336, #4CAF50, #FFEB3B, #2196F3);
-      filter: blur(80px);
-      z-index: 0;
-      border-radius: inherit;
-      opacity: 0.7;
-      will-change: opacity;
-      animation: pulseGlow 3s ease-in-out infinite alternate;
-    }
-    .brand-icon img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      position: relative;
-      z-index: 1;
-      filter: drop-shadow(0 6px 15px rgba(0,0,0,0.15));
-      will-change: transform;
-      animation: danceFloat 3s ease-in-out infinite;
-    }
-    /* opacity فقط — لا scale لأنه يُعيد رسم blur الخلفية */
-    @keyframes pulseGlow {
-      0%   { opacity: 0.5; }
-      100% { opacity: 0.85; }
-    }
-    @keyframes danceFloat {
-      0%   { transform: translateY(0) rotate(0deg); }
-      25%  { transform: translateY(-6px) rotate(-4deg); }
-      50%  { transform: translateY(0) rotate(0deg); }
-      75%  { transform: translateY(-6px) rotate(4deg); }
-      100% { transform: translateY(0) rotate(0deg); }
-    }
+        .checkmark-wrapper {
+            width: 90px;
+            height: 90px;
+            margin: 0 auto 20px auto;
+        }
 
-    .brand-name { font-size: 25px; font-weight: 800; color: #1a252f; margin-bottom: 4px; position: relative; z-index: 1; }
-    .brand-name span { color: #27ae60; }
-    .brand-sub { font-size: 13px; color: #5d6d7e; margin-bottom: 6px; position: relative; z-index: 1; }
+        /* رسمة الـ SVG للصح الأخضر */
+        .svg-checkmark {
+            width: 100%;
+            height: 100%;
+            transform: scale(0);
+            opacity: 0;
+        }
 
-    .divider {
-      width: 64px; height: 2px;
-      background: linear-gradient(90deg, transparent, #a8edea, #fed6e3, transparent);
-      margin: 10px auto 14px;
-      border-radius: 2px;
-      position: relative; z-index: 1;
-    }
+        /* حركة الانبثاق السريع جداً (ربع ثانية) */
+        .svg-checkmark.animate {
+            animation: popIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
 
-    .tagline { font-size: 16px; font-weight: 500; color: #5d6d7e; line-height: 1.6; margin-bottom: 26px; position: relative; z-index: 1; }
+        .status-badge {
+            background-color: #f0fff4;
+            border: 1px solid #c6f6d5;
+            color: #22543d;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 25px;
+        }
 
-    /* ── Review Button ── */
-    .review-btn {
-      position: relative; z-index: 1;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-      color: #fff;
-      font-family: 'Tajawal', sans-serif;
-      font-size: 17px; font-weight: 800;
-      padding: 15px 40px;
-      border-radius: 50px;
-      text-decoration: none;
-      border: none;
-      cursor: pointer;
-      box-shadow: 0 6px 22px rgba(17,153,142,0.35);
-      transition: transform 0.3s, box-shadow 0.3s;
-    }
-    .review-btn::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      border-radius: 50px;
-      box-shadow: 0 6px 34px rgba(56,239,125,0.55), 0 0 0 5px rgba(56,239,125,0.1);
-      opacity: 0;
-      animation: btnGlowPulse 2.8s ease-in-out infinite;
-      z-index: -1;
-      pointer-events: none;
-      will-change: opacity;
-    }
-    @keyframes btnGlowPulse {
-      0%, 100% { opacity: 0; }
-      50%       { opacity: 1; }
-    }
-    .review-btn:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 10px 30px rgba(17,153,142,0.45); }
+        /* جدول بيانات الموظفة */
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            text-align: right;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #edf2f7;
+        }
 
-    /* ── Reviews Section ── */
-    .reviews-label {
-      font-size: 15px; font-weight: 700;
-      color: #5d6d7e;
-      letter-spacing: 0.5px;
-      margin: 40px 0 18px;
-      text-align: center;
-    }
+        .info-row {
+            display: flex;
+            border-bottom: 1px solid #edf2f7;
+        }}
 
-    .reviews-grid {
-      width: 100%; max-width: 520px;
-      display: flex; flex-direction: column;
-      gap: 14px;
-    }
+        .info-row:last-child {
+            border-bottom: none;
+        }
 
-    /*
-     * ═══════════════════════════════════════════════════════
-     * FIX #7: Review Cards — إزالة backdrop-filter
-     * كل .gm-card كان يحمل backdrop-filter:blur(18px).
-     * مع 100+ بطاقة → 100+ طبقة compositing تتراكم.
-     * الحل: خلفية بيضاء عالية الشفافية + box-shadow قوي
-     * يُعطي نفس الإحساس الزجاجي بصرياً بلا تكلفة GPU.
-     * ═══════════════════════════════════════════════════════
-     */
-    .gm-card {
-      background: rgba(255, 255, 255, 0.88);
-      border: 1px solid rgba(255, 255, 255, 0.95);
-      border-radius: 18px;
-      padding: 18px;
-      box-shadow:
-        0 3px 14px rgba(0,0,0,0.07),
-        inset 0 1px 0 rgba(255,255,255,0.9);
-      text-align: start;
-      opacity: 0;
-      transform: translateY(40px);
-      transition: opacity 0.7s cubic-bezier(0.22,1,0.36,1), transform 0.7s cubic-bezier(0.22,1,0.36,1), box-shadow 0.2s;
-    }
-    .gm-card.in-view { opacity: 1; transform: translateY(0); }
-    .gm-card.in-view:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.11); }
+        .info-label {
+            width: 35%;
+            background-color: #f7fafc;
+            padding: 12px 15px;
+            font-weight: 500;
+            color: #4a5568;
+            font-size: 13px;
+        }
 
-    .gm-header { display: flex; align-items: center; margin-bottom: 10px; gap: 12px; }
-    .gm-avatar {
-      width: 42px; height: 42px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 17px; font-weight: 700; color: #fff;
-      flex-shrink: 0;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    }
-    .gm-user-info { flex: 1; min-width: 0; }
-    .gm-name { font-size: 15px; font-weight: 700; color: #202124; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .gm-meta { font-size: 12px; color: #70757a; margin-top: 1px; }
-    .gm-menu { color: #70757a; font-size: 20px; cursor: default; padding: 0 4px; }
-    .gm-rating-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-    .gm-stars { color: #fbbc04; font-size: 16px; letter-spacing: 2px; }
-    .gm-time { font-size: 12px; color: #70757a; }
-    .gm-text { font-size: 14px; line-height: 1.65; color: #3c4043; }
+        .info-value {
+            width: 65%;
+            padding: 12px 15px;
+            font-weight: 600;
+            color: #1a202c;
+            font-size: 14px;
+        }
 
-    /* ── Modal ── */
-    .modal-overlay {
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,0.4);
-      /* backdrop-filter هنا مقبول لأنه يظهر فقط عند فتح المودال */
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      z-index: 100;
-      display: flex; align-items: center; justify-content: center;
-      padding: 20px;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s;
-    }
-    .modal-overlay.active { opacity: 1; pointer-events: all; }
-    .modal {
-      background: rgba(255,255,255,0.96);
-      border: 1px solid rgba(255,255,255,0.98);
-      border-radius: 26px;
-      padding: 36px 28px;
-      width: 100%; max-width: 380px;
-      box-shadow: 0 24px 60px rgba(0,0,0,0.14);
-      transform: scale(0.92) translateY(20px);
-      transition: transform 0.35s cubic-bezier(0.22,1,0.36,1);
-      text-align: center;
-    }
-    .modal-overlay.active .modal { transform: scale(1) translateY(0); }
+        /* تذييل الصفحة السفلي */
+        .card-footer {
+            background-color: #fafafa;
+            padding: 15px 20px;
+            border-top: 1px solid #edf2f7;
+            font-size: 11px;
+            color: #a0aec0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-    .modal-icon { font-size: 36px; margin-bottom: 14px; }
-    .modal-title { font-size: 20px; font-weight: 700; color: #1a252f; margin-bottom: 5px; }
-    .modal-sub { font-size: 13px; color: #7f8c8d; margin-bottom: 22px; }
+        .secure-lock {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            color: #48bb78;
+            font-weight: 500;
+        }
 
-    .field-group { margin-bottom: 14px; text-align: start; }
-    .field-label { display: block; font-size: 13px; font-weight: 700; color: #27ae60; margin-bottom: 6px; }
-    .field-input {
-      width: 100%;
-      background: rgba(0,0,0,0.03);
-      border: 1px solid rgba(0,0,0,0.1);
-      border-radius: 12px;
-      padding: 13px 16px;
-      font-family: 'Tajawal', sans-serif;
-      font-size: 15px; color: #1a252f;
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    .field-input:focus { border-color: #27ae60; box-shadow: 0 0 0 3px rgba(39,174,96,0.1); background: #fff; }
-    .field-input::placeholder { color: #aaa; }
+        /* حركات التحريك (Animations) */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
 
-    .modal-note { font-size: 13px; color: #7f8c8d; margin: 14px 0 20px; }
-    .modal-actions { display: flex; gap: 10px; }
-    .btn-submit {
-      flex: 1;
-      background: linear-gradient(135deg, #11998e, #38ef7d);
-      color: #fff;
-      font-family: 'Tajawal', sans-serif;
-      font-size: 15px; font-weight: 800;
-      padding: 13px; border: none; border-radius: 12px;
-      cursor: pointer; transition: opacity 0.2s, transform 0.2s;
-    }
-    .btn-submit:hover { opacity: 0.9; transform: translateY(-1px); }
-    .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-    .btn-cancel {
-      background: rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.1);
-      color: #1a252f; font-family: 'Tajawal', sans-serif;
-      font-size: 15px; padding: 13px 18px; border-radius: 12px;
-      cursor: pointer; transition: background 0.2s;
-    }
-    .btn-cancel:hover { background: rgba(0,0,0,0.09); }
+        @keyframes pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(0.9); opacity: 0.5; }
+            50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.9; }
+        }
 
-    .success-msg { display: none; flex-direction: column; align-items: center; gap: 12px; padding: 20px 0; }
-    .success-msg.show { display: flex; }
-    .form-content.hide { display: none; }
-    .success-icon { font-size: 50px; }
-    .success-text { font-size: 17px; font-weight: 700; color: #1a252f; }
-    .success-sub { font-size: 13px; color: #7f8c8d; }
-
-    /* ── Footer ── */
-    .footer { margin-top: 44px; text-align: center; color: #95a5a6; font-size: 13px; }
-
-    /* ── Touch Effect ── */
-    .touch-emoji {
-      position: fixed;
-      font-size: 30px;
-      pointer-events: none;
-      z-index: 9999;
-      animation: touchFade 0.6s ease-out forwards;
-      will-change: transform, opacity;
-    }
-    @keyframes touchFade {
-      0%   { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
-      100% { transform: translate(-50%, -50%) scale(1.5) translateY(-30px); opacity: 0; }
-    }
-  </style>
-
+        @keyframes popIn {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+            80% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+    </style>
 </head>
 <body>
 
-<!-- Aurora: z-index 0 -->
+    <div class="verification-container">
+        <!-- ترويسة الشركة -->
+        <div class="card-header">
+            <!-- الشعار مدمج ديناميكياً هنا من المرفقات -->
+            <img class="company-logo" src="data:image/png;base64,..." alt="شعار شركة المؤشر الأخضر">
+            <div class="company-name">شركة المؤشر الأخضر</div>
+            <div class="system-title">بوابة التحقق الذكي من الهوية</div>
+        </div>
 
-<div class="aurora">
-  <div class="aurora-blob"></div>
-  <div class="aurora-blob"></div>
-  <div class="aurora-blob"></div>
-  <div class="aurora-blob"></div>
-</div>
+        <!-- محتوى التحقق والتأكيد -->
+        <div class="card-body">
+            
+            <!-- أولاً: واجهة التحميل والبحث المؤقتة -->
+            <div id="loading-state">
+                <div class="spinner-container">
+                    <div class="spinner"></div>
+                </div>
+                <div class="loading-text">جاري البحث في قاعدة البيانات والتحقق من السجلات...</div>
+            </div>
 
-<!-- body::before يحل محل glass-overlay: z-index 1 -->
+            <!-- ثانياً: واجهة ظهور النتيجة بعد ثانيتين -->
+            <div id="success-state">
+                <!-- الـ SVG الخاص بالصح الأخضر مع الأنيميشن السريع -->
+                <div class="checkmark-wrapper">
+                    <svg class="svg-checkmark" id="checkmark-svg" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="26" cy="26" r="25" fill="#38a169"/>
+                        <path d="M16 26L23 33L37 19" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
 
-<!-- Floaters: z-index 2 -->
+                <div class="status-badge">
+                    <span>تم التحقق من صحة البطاقة</span>
+                </div>
 
-<div class="floaters">
-  <div class="floater">🦋</div>
-</div>
+                <!-- بيانات الموظفة الرسمية -->
+                <div class="info-table">
+                    <div class="info-row">
+                        <div class="info-label">اسم الموظفة</div>
+                        <div class="info-value">سارة عبد العزيز الشمري</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">الرقم الوظيفي</div>
+                        <div class="info-value">GI-8942</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">المسمى الوظيفي</div>
+                        <div class="info-value">أخصائي تطوير أعمال أول</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">الإدارة</div>
+                        <div class="info-value">إدارة الاستثمار والشراكات</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">حالة الحساب</div>
+                        <div class="info-value" style="color: #38a169;">نشط / مصرح له</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">وقت التحقق</div>
+                        <div class="info-value" id="verification-time">-</div>
+                    </div>
+                </div>
+            </div>
 
-<!-- Top Bar: z-index 50 -->
+        </div>
 
-<div class="top-bar">
-  <div class="top-bar-inner">
-    <button class="action-btn" id="reportBtn" onclick="window.open('https://lamspecial.github.io/cs/portal.html','_blank')">
-      <span>⚑</span> إبلاغ
-    </button>
-    <button class="action-btn" onclick="toggleLang()" id="langBtn" style="width:44px;padding:0;justify-content:center;font-size:17px;font-weight:700;">
-      E
-    </button>
-  </div>
-</div>
-
-<!-- Page Content: z-index 3 -->
-
-<div class="page">
-
-  <div class="hero-card">
-    <div class="brand-icon">
-      <img src="special.png" alt="I am Special Logo">
+        <!-- التذييل الأمني -->
+        <div class="card-footer">
+            <div class="secure-lock">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+                </svg>
+                اتصال آمن ومُشفر
+            </div>
+            <div>الرقم المرجعي: GI-VRF-2026</div>
+        </div>
     </div>
 
-<div class="brand-name" id="brandName">مركز <span>اي ام سبيشل</span> للضيافة الترفيهية للأطفال</div>
-<div class="divider"></div>
-<div class="brand-sub" id="brandSub">الرياض جاليري</div>
-<p class="tagline" id="tagline">رأيك يصنع تجربة أجمل للأطفال</p>
-<a class="review-btn" href="https://g.page/r/CWOintQMoX1GEBM/review" target="_blank" rel="noopener" id="reviewBtn">
-  ★ تقييم الآن
-</a>
-
-  </div>
-
-  <p class="reviews-label" id="reviewsLabel">ماذا قال أولياء الأمور عنا</p>
-  <div class="reviews-grid" id="reviewsContainer"></div>
-
-  <div class="footer" id="footer">© مركز اي ام سبيشل للضيافة الترفيهية — جميع الحقوق محفوظة</div>
-</div>
-
-<!-- Modal: z-index 100 -->
-
-<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
-  <div class="modal">
-    <div class="form-content" id="formContent">
-      <div class="modal-icon">📞</div>
-      <div class="modal-title" id="modalTitle">طلب اتصال</div>
-      <div class="modal-sub" id="modalSub">يرجى تزويدنا بمعلوماتك للتواصل معك</div>
-
-  <div class="field-group">
-    <label class="field-label" for="phoneInput" id="phoneLabel">رقم الجوال</label>
-    <input class="field-input" id="phoneInput" type="tel" placeholder="05XXXXXXXX" maxlength="10" />
-  </div>
-  <div class="field-group">
-    <label class="field-label" for="childInput" id="childLabel">اسم الطفل</label>
-    <input class="field-input" id="childInput" type="text" placeholder="..." />
-  </div>
-
-  <div class="modal-note" id="modalNote">☏ سيتم الاتصال بك خلال دقائق</div>
-
-  <div class="modal-actions">
-    <button class="btn-submit" id="submitBtn" onclick="submitReport()">إرسال الطلب</button>
-    <button class="btn-cancel" id="cancelBtn" onclick="closeModal()">إلغاء</button>
-  </div>
-</div>
-
-<div class="success-msg" id="successMsg">
-  <div class="success-icon">✅</div>
-  <div class="success-text" id="successText">تم استلام رسالتك بنجاح</div>
-  <p class="success-sub" id="successSub">ستتواصل الإدارة معك قريباً</p>
-  <button class="btn-submit" id="successOkBtn" style="max-width:150px;margin-top:8px;" onclick="closeModal()">حسناً</button>
-</div>
-
-  </div>
-</div>
-
-<script>
-  // ── Real Reviews Data ──
-  const allReviews = [
-    { name: "AFNAN",                text: "افضل مكان امن لطفلك عجبني نظيففف وفي موظفات ينتبهون عالاطفال بكل مكان وحماماتهم نظيفففه وافضل شي المكان بدون موسيقى اشكرهم يستاهلون من يجيهم في جلسات حلوه سعرهم محدد بكل الاحوال مفروض في خصم للأخوة اتمنى يعيدون النظر" },
-    { name: "Nada Taha",            text: "المكان جميل اوي والقائمين عليه ناس محترمة و بيحبوا الأطفال من قلوبهم بجد و بيطمنونا عليهم كل شويه كأننا معاهم بالظبط، ده غير مكان إستراحة الأباء حاجه فخمة وجميله جدا تحياتي ليهم و ميس ليلى ربنا يجزايهم كل خير ♥️🥰" },
-    { name: "جوجو F",               text: "ما شاء الله المكان مميز جدًا ويستحق الزيارة من النادر نجد أماكن تجمع بين الامان والنظافة والتعامل الراقي وتنوع الألعاب إن شاء الله يستمرون بنفس الجودة ويتطورون للأفضل يستحقون الدعم والتقدير على جهودهم في توفير بيئة ممتعة وآمنة للأطفال، الأسعار المرتفعة تقلل من عدد الزبائن تخفيضها يزيد الإقبال ويحقق أرباحًا أكثر على المدى الطويل." },
-    { name: "Nouf T",               text: "الموظفات رائعات ولبقات المكان جميل والنظافة عالية مغلق وامن للاطفال مايطلعون الطفل الا بحضور الاهل ومعهم الاثبات. توجد جلسات للاهل ودورات مياه وتوجد دورات مياه للاطفال داخل نطاق اللعب. يوجد كافتيريا صغيرة للاطفال ويوجد غرفة لنوم الاطفال الصغار. المكان جميل وزرته اكثر من مرة لمختلف اعمار اطفالي شكرا im special" },
-    { name: "Mjeed Ca",             text: "المكان مناسب جداً للاطفال وتنوع خيارات الالعاب. المشرفات الله يوفقهم يتابعون الاطفال عند كل قسم وملاصق لهم فرن هيله يعني تقدر تشتري لهم الاكل. يعني الطفل يجلس طول الوقت والوالدين متطمنين لسلامتهم واكلهم عندهم." },
-    { name: "Mariam AlRasheed",     text: "مكان لطيف وجميل و آمن للأطفال. نظيف جدا والفتيات اللي يشتغلون فيه قمة الاحترام والمسؤولية. طفلي جدا انبسط فيه. مستوى النظافة فيه ملفت كذلك تعدد مناطق اللعب بين حركية و ذكاء و تواصل. الطفل يلعب ٧٥ مفتوح طوال اليوم حتى لو اضطريتوا الخروج تقدرون ترجعون أي وقت في نفس اليوم. Great place for kids to have fun and learn. Definitely recommended 👍🏼" },
-    { name: "aseel",                text: "اول شي احب اشكر الموظفه ليلى عسل و لطيفه مع الاطفال 🧡🧡 و المكان حلو و متنوع بس كان عندي ملاحظه بسيطه على مكان الكور ليته بس يفضلونه عن الرمل او يتنظف بشكل دوري ولا الباقي كل شي تمام الله يعطيهم العافيه" },
-    { name: "Sana Haj Amor",        text: "من أفضل الحضانات اللي مرّت علينا، ولدي التحق فيها وهو جدًا مبسوط ومرتاح. أكثر شي أسعدني إنه صار يقول لي: أحلى روضة في العالم 🩷 شكر خاص للمعلمة ليلى على حرصها وحنّيتها واهتمامها بالأطفال، واضح حبها لعملها وأثره الكبير على نفسية الطفل. أنصح فيها بكل ثقة 🌟" },
-    { name: "Nourah Falah",         text: "صراحه يستاهلون التقييم الكامل المكان جدا مناسب للاطفال الصغار والموظفات السعوديات اللي فيه مهتمين بالاطفال وفيه مسابقات جوا يخلون الاطفال يكونون صداقات ويتعرفون ع بعض ويلعبون سوا والنظافه ع مدار الوقت والدخول والخروج امن مايخلون الطفل يطلع مع اي احد وفيه هديه لكل طفل عند الخروج." },
-    { name: "لمسات فلسطينية",       text: "المكان جميل ونظيف وفيه فعاليات والالعاب آمنة عالاطفال الارضيات والحواف كله اسفنج وفوم والالعاب مناسبة لمختلف الاعمار. فيه مكان مخصص للاكل للاطفال وفيه مكان لاستراحة الاهل. ويعطو لكل طفل هدية لما يخلص لعب." },
-    { name: "Angel",                text: "المكان يجنننن يابنات أول مره ادخل ولدي اماكن كذا بسبب ان اللي دايم مايكون فيها رقابه ولازم مرافقين. لكن هذا يجنن وأمان والعاملات ورا الاطفال والموظفات يسوون فعالياات. في مكان مخصص للاطفال تحت ٣ سنوات وفيه عاملات معاهم. المكان ١٠٠٠٠٠/١٠" },
-    { name: "ندى ورد الجنوب",       text: "انصح كل ام تودي طفلها يهبل وفيه كوفي والموظفات متعاونات والمكان نظيف نظيف وجميل وجديد شكرا ايام سبشل وليس اخر زياره وترا يحطون اناشيد بدون موسيقى احلى شي لرمضان وفيه حضانه الصبح" },
-    { name: "كيان انثى",            text: "مكان رائع وهادي للاطفال جدا استمتعوا اطفالى والموظفات ذوق ومحترمات النظافه ممتازه والعاملات مخلصات وخدومات." },
-    { name: "قايد الريم",           text: "المكان رغم انه للاطفال الا انه هاديء وراقي جدا ومستوى النظافه فيه عالية جدا، ايضا يتميز بالاناشيد الهادئة البعيده عن صخب الموسيقى والازعاج. احرص اني اجيب اطفالي لمثل هالمكان واكون جنبهم استمتع بقهوتي وهم يلعبون ويمارسون هواياتهم. بارك الله في جهود جميع القائمين على المركز." },
-    { name: "Rasid Salim",          text: "المكان جديد ومميز للأطفال حيث نوعية الأنشطة والالعاب داخل المحل جميل والأطفال يقضون وقت رائع ولا يملون كذلك الفريق العامل مهتم جدا على راحة والاهتمام كما يوجد مكان للجلوس للأسر ومرافقي الأطفال انصح بها" },
-    { name: "روان عبدالله",          text: "افضل وأجمل ملاهي أطفال دخلته طاقم نسائي سعودي متكامل تعامل راقي ولطف وأهتمام عالي. التنظيف مستمر طوال الوقت الحاجز زجاج شفاف ومع ذلك مافيه اي بقع او اثار. حتى اناشيد الاطفال المشغله بدون موسيقى وايقاعات مزعجه. مكان جميل ومريح اتمنى يستمر في هذا المستوى." },
-    { name: "B",                    text: "جمييييل جدًا والموظفات عسل ومررة منتبهين للاطفال والمكان نظييييف جدًا يناسب الى عمر ٩ سنوات تقريبا انصح في الزيارة الصراحة. الله يبارك لهم في رزقهم" },
-    { name: "Na An",                text: "المكان جميل وممتع جداً للاطفال وكبير وهذا اجمل شي ويعطون اطفالكم هديه بعد الخروج. بعتمده لطفلتي ان شاء الله." },
-    { name: "Maram Ab",             text: "المكان مرتب للعب الاطفال، نظيف، العاملات سواء السعوديات او الفلبينيات قمه في الرقي والمتابعة الله يكتب اجرهم." }
-  ];
-
-  const avatarColors = ['#e53935','#d81b60','#8e24aa','#5e35b1','#3949ab','#1e88e5','#039be5','#00acc1','#00897b','#43a047','#7cb342','#f4511e','#f6bf26','#0b8043','#3f51b5'];
-  const timeOptionsAr = ['منذ أسبوع','منذ أسبوعين','منذ شهر','منذ شهرين','منذ ٣ أشهر','منذ ٤ أشهر','منذ ٥ أشهر'];
-  const timeOptionsEn = ['A week ago','Two weeks ago','A month ago','2 months ago','3 months ago','4 months ago','5 months ago'];
-  
-  let lang = localStorage.getItem('lang') || 'ar';
-
-  function applyLang() {
-    document.documentElement.lang = lang;
-    document.documentElement.dir  = lang === 'ar' ? 'rtl' : 'ltr';
-    document.getElementById('langBtn').textContent = lang === 'ar' ? 'E' : 'ع';
-    
-    if (lang === 'en') {
-      document.getElementById('brandName').innerHTML   = '<span>I am Special</span> Entertainment Care';
-      document.getElementById('brandSub').textContent  = 'Sharq Plaza';
-      document.getElementById('tagline').textContent   = "Your feedback shapes a better experience for every child";
-      document.getElementById('reviewBtn').textContent = '★ Review Now';
-      document.getElementById('reviewsLabel').textContent = "What Parents Say About Us";
-      document.getElementById('footer').textContent    = '© I am Special Entertainment Care — All Rights Reserved';
-      document.getElementById('reportBtn').innerHTML = '<span>⚑</span> Report';
-      document.getElementById('modalTitle').textContent = 'Request a Call';
-      document.getElementById('modalSub').textContent = 'Please provide your info to contact you';
-      document.getElementById('phoneLabel').textContent = 'Phone Number';
-      document.getElementById('childLabel').textContent = 'Child Name';
-      document.getElementById('modalNote').textContent = '☏ You will be contacted in minutes';
-      document.getElementById('submitBtn').textContent = 'Submit Request';
-      document.getElementById('cancelBtn').textContent = 'Cancel';
-      document.getElementById('successText').textContent = 'Message Received Successfully';
-      document.getElementById('successSub').textContent = 'Management will contact you soon';
-      document.getElementById('successOkBtn').textContent = 'OK';
-    } else {
-      document.getElementById('brandName').innerHTML   = 'مركز <span>اي ام سبيشل</span> للضيافة الترفيهية للأطفال';
-      document.getElementById('brandSub').textContent  = 'شرق بلازا';
-      document.getElementById('tagline').textContent   = 'رأيك يصنع تجربة أجمل للأطفال';
-      document.getElementById('reviewBtn').innerHTML   = '★ تقييم الآن';
-      document.getElementById('reviewsLabel').textContent = 'ماذا قال أولياء الأمور عنا';
-      document.getElementById('footer').textContent   = '© مركز اي ام سبيشل للضيافة الترفيهية للأطفال — جميع الحقوق محفوظة';
-      document.getElementById('reportBtn').innerHTML = '<span>⚑</span> إبلاغ';
-      document.getElementById('modalTitle').textContent = 'طلب اتصال';
-      document.getElementById('modalSub').textContent = 'يرجى تزويدنا بمعلوماتك للتواصل معك';
-      document.getElementById('phoneLabel').textContent = 'رقم الجوال';
-      document.getElementById('childLabel').textContent = 'اسم الطفل';
-      document.getElementById('modalNote').textContent = '☏ سيتم الاتصال بك خلال دقائق';
-      document.getElementById('submitBtn').textContent = 'إرسال الطلب';
-      document.getElementById('cancelBtn').textContent = 'إلغاء';
-      document.getElementById('successText').textContent = 'تم استلام رسالتك بنجاح';
-      document.getElementById('successSub').textContent = 'ستتواصل الإدارة معك قريباً';
-      document.getElementById('successOkBtn').textContent = 'حسناً';
-    }
-    
-    buildReviews();
-  }
-
-  function toggleLang() {
-    lang = lang === 'ar' ? 'en' : 'ar';
-    localStorage.setItem('lang', lang);
-    applyLang();
-  }
-
-  function shuffle(arr) {
-    const a = [...arr];
-    for (let i = a.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [a[i], a[j]] = [a[j], a[i]];
-    }
-    return a;
-  }
-
-  function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
-
-  function isEnglishText(text) {
-    const engMatches = (text.match(/[a-zA-Z]/g) || []).length;
-    const arMatches  = (text.match(/[\u0600-\u06FF]/g) || []).length;
-    return engMatches > arMatches;
-  }
-
-  function buildReviews() {
-    let shuffled = shuffle(allReviews);
-    
-    shuffled.sort((a, b) => {
-      const aEng = isEnglishText(a.text) || isEnglishText(a.name);
-      const bEng = isEnglishText(b.text) || isEnglishText(b.name);
-      if (lang === 'en') {
-        if (aEng && !bEng) return -1;
-        if (!aEng && bEng) return 1;
-      } else {
-        if (!aEng && bEng) return -1;
-        if (aEng && !bEng) return 1;
-      }
-      return 0;
-    });
-    
-    const container = document.getElementById('reviewsContainer');
-    const timeOptions = lang === 'en' ? timeOptionsEn : timeOptionsAr;
-
-    /*
-     * FIX #8: بناء HTML كـ string واحدة ثم innerHTML مرة واحدة
-     * بدلاً من appendChild في loop → يقلل reflow من N مرة لمرة واحدة
-     */
-    const fragment = document.createDocumentFragment();
-    const temp = document.createElement('div');
-    
-    let html = '';
-    shuffled.forEach(r => {
-      const letter   = r.name.charAt(0).toUpperCase();
-      const color    = pick(avatarColors);
-      const time     = pick(timeOptions);
-      const metaText = '';
-
-      html += `
-        <div class="gm-card">
-          <div class="gm-header">
-            <div class="gm-avatar" style="background:${color}">${letter}</div>
-            <div class="gm-user-info">
-              <div class="gm-name">${r.name}</div>
-              <div class="gm-meta">${metaText}</div>
-            </div>
-            <div class="gm-menu">⋮</div>
-          </div>
-          <div class="gm-rating-row">
-            <div class="gm-stars">★★★★★</div>
-            <div class="gm-time">${time}</div>
-          </div>
-          <div class="gm-text">${r.text}</div>
-        </div>`;
-    });
-    
-    container.innerHTML = html;
-    observeReviews();
-  }
-
-  // ── Gradual Reveal ──
-  function observeReviews() {
-    const cards = document.querySelectorAll('.gm-card');
-    let delayCounter = 0;
-    let lastEntryTime = 0;
-
-    const observer = new IntersectionObserver((entries, obs) => {
-      const now = Date.now();
-      if (now - lastEntryTime > 150) delayCounter = 0;
-      lastEntryTime = now;
-
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          setTimeout(() => {
-            entry.target.classList.add('in-view');
-          }, delayCounter * 120);
-          delayCounter++;
-          obs.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.1, rootMargin: '0px 0px -20px 0px' });
-    
-    cards.forEach(card => observer.observe(card));
-  }
-
-  // ── Modal ──
-  function openModal() {
-    document.getElementById('modalOverlay').classList.add('active');
-    document.getElementById('formContent').classList.remove('hide');
-    document.getElementById('successMsg').classList.remove('show');
-    document.getElementById('phoneInput').value = '';
-    document.getElementById('childInput').value = '';
-  }
-  
-  function closeModal() {
-    document.getElementById('modalOverlay').classList.remove('active');
-  }
-  
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
-  
-  document.getElementById('phoneInput').addEventListener('input', function() {
-    this.style.borderColor = 'rgba(0,0,0,0.1)';
-  });
-  
-  async function submitReport() {
-    const phone = document.getElementById('phoneInput').value.trim();
-    if (!phone) {
-      document.getElementById('phoneInput').style.borderColor = '#ff6b6b';
-      document.getElementById('phoneInput').focus();
-      return;
-    }
-    
-    const btn = document.getElementById('submitBtn');
-    const originalText = btn.textContent;
-    btn.textContent = lang === 'en' ? 'Sending...' : 'جاري الإرسال...';
-    btn.disabled = true;
-    
-    await new Promise(r => setTimeout(r, 1000));
-    
-    document.getElementById('formContent').classList.add('hide');
-    document.getElementById('successMsg').classList.add('show');
-    btn.textContent = originalText;
-    btn.disabled = false;
-  }
-
-  // ── Touch Effect ──
-  let emojiToggle = true;
-
-  document.addEventListener('pointerdown', (e) => {
-    if (e.pointerType === 'mouse') return;
-    const emoji = document.createElement('div');
-    emoji.className = 'touch-emoji';
-    emoji.textContent = emojiToggle ? '🌸' : '🦋';
-    emojiToggle = !emojiToggle;
-    emoji.style.left = e.clientX + 'px';
-    emoji.style.top  = e.clientY + 'px';
-    document.body.appendChild(emoji);
-    setTimeout(() => emoji.remove(), 600);
-  });
-
-  // ── Init ──
-  document.addEventListener('DOMContentLoaded', applyLang);
-</script>
-
+    <!-- التحكم البرمجي بالوقت والحركات -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // مؤقت لمدة ثانيتين للبحث الشكلي في قاعدة البيانات
+            setTimeout(function() {
+                // إخفاء التحميل
+                document.getElementById('loading-state').style.display = 'none';
+                
+                // إظهار النتيجة والبيانات
+                const successState = document.getElementById('success-state');
+                successState.style.display = 'block';
+                
+                // تفعيل حركة انبثاق الصح الأخضر خلال ربع ثانية
+                const checkmark = document.getElementById('checkmark-svg');
+                checkmark.classList.add('animate');
+                
+                // طباعة الوقت الفعلي الحالي للتحقق
+                const now = new Date();
+                const options = { 
+                    year: 'numeric', 
+                    month: '2-digit', 
+                    day: '2-digit',
+                    hour: '2-digit', 
+                    minute: '2-digit', 
+                    second: '2-digit',
+                    hour12: true
+                };
+                document.getElementById('verification-time').innerText = now.toLocaleString('ar-EG', options);
+                
+            }, 2000); // 2000 مللي ثانية = ثانيتين
+        });
+    </script>
 </body>
 </html>
